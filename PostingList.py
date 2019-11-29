@@ -17,9 +17,8 @@ class PostingList:
         print(self.__gaps)
         if type == "V": # Varint
                 self.__postingList = self.VBEncode(self.__gaps)
-
         elif type == "LP": # Length precoded
-            pass
+            self.__postingList = self.VBEncode(self.__gaps)
         elif type == "GV": # Group varint
             pass
     ###############
@@ -181,9 +180,10 @@ print(LPEncoding(15))
 print(LPEncoding(22))
 print(LPEncoding(23))
 '''
-
+postListLP = PostingList(testList,"LP")
 print("length of number in bits is smaller than 15")
-print(LPEncoding(64))
+
+print(postListLP.GetList())
 #print(LPEncoding(100))
 #print(LPEncoding(122))
 
