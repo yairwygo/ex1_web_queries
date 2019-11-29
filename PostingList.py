@@ -74,13 +74,66 @@ class PostingList:
         return bytesList
     ###############
 
-
     def VBEncode(self,numbers):
         byteStream = bytearray()
         #print(numbers)
         for number in numbers:
-            byteStream += self.VBEncodeNumber(number)
+            if self.type =="V":
+                byteStream += self.VBEncodeNumber(number)
+            elif self.type =="LP":
+                byteStream += self.LPEncodingNumber(number)
+            elif type == "GV":
+                pass
         return byteStream
+    ###############
+
+    def LPEncodingNumber(self,n):
+        bytesList = bytearray()
+        binaryNum = bin(n).replace("0b", "")
+        byteLength = ''
+        if len(binaryNum) < 7:
+            byteLength = '00'  # 1
+            zeros = '0' * (6 - len(binaryNum))  # CALCULATE ZEROS
+            byteLength += zeros
+            byteLength += binaryNum
+            bytesList.append(int(byteLength, 2))
+            return bytesList
+        elif len(binaryNum) < 15:
+            byteLength = '01'  # 2
+            zeros = '0' * (14 - len(binaryNum))  # CALCULATE ZEROS
+            byteLength += zeros
+            byteLength += binaryNum
+            bytesList = self.bitsToBytes(byteLength)
+            return bytesList
+        elif len(binaryNum) < 23:
+            byteLength = '10'  # 3
+            zeros = '0' * (22 - len(binaryNum))  # CALCULATE ZEROS
+            byteLength += zeros
+            byteLength += binaryNum
+            bytesList = self.bitsToBytes(byteLength)
+            return bytesList
+        elif len(binaryNum) < 31:
+            byteLength = '11'  # 4
+            zeros = '0' * (30 - len(binaryNum))  # CALCULATE ZEROS
+            byteLength += zeros
+            byteLength += zeros
+            byteLength += binaryNum
+            bytesList = self.bitsToBytes(byteLength)
+            return bytesList
+    ###############
+
+    def bitsToBytes(self,bits):
+        bytes = bytearray()
+        count = len(bits) / 8
+        temp = bits
+        currByte = ''
+        while count > 0:
+            currByte = temp[:8]
+            bytes.append(int(currByte, 2))
+            temp = temp[8:]
+            count -= 1
+        return bytes
+
     ###############
 
     def GetList(self):
@@ -110,6 +163,32 @@ print(postListV.GetList())
 
 
 ##print('\n\n\n\n######################################################################################################')
+
+
+
+
+
+
+
+
+'''
+print("length of number in bits is smaller than 7")
+print(LPEncoding(1))
+print(LPEncoding(7))
+print(LPEncoding(8))
+print(LPEncoding(14))
+print(LPEncoding(15))
+print(LPEncoding(22))
+print(LPEncoding(23))
+'''
+
+print("length of number in bits is smaller than 15")
+print(LPEncoding(64))
+#print(LPEncoding(100))
+#print(LPEncoding(122))
+
+
+
 
 '''
 a = bin(824).replace("0b","")
