@@ -19,7 +19,7 @@ class Dictionary:
                 self.__dictionaryStr += term
                 self.__table.append(counter)
                 counter+=len(term)
-            print(self.__table)
+            #print(self.__table)
         else:
             self.__table = []
             self.type ,self.k = type
@@ -27,7 +27,7 @@ class Dictionary:
             self.TermList = TermList
             for i in range(add):
                 self.TermList.append(None)
-            print(self.TermList)
+            #print(self.TermList)
 
             if self.type == "BLK":
                 for i in range(0,len(TermList),self.k):
@@ -42,7 +42,7 @@ class Dictionary:
                         count+=1
                     self.__table.append(tuple(block))
 
-                print(self.__table)
+                #print(self.__table)
                 #TO String
             elif self.type == "FC":
                 for i in range(0, len(TermList), self.k):
@@ -62,8 +62,8 @@ class Dictionary:
                         block.append((len(nextWord), len(prefix)))
                         count += 1
                     self.__table.append(tuple(block))
-                print(self.__dictionaryStr)
-                print(self.__table)
+                #print(self.__dictionaryStr)
+                #print(self.__table)
 
 
     #########################################
@@ -77,7 +77,7 @@ class Dictionary:
                     return prefix
         return prefix
     #########################################
-    
+
     def GetString(self):
         """Returns the dictionary's string"""
         return self.__dictionaryStr
@@ -124,72 +124,69 @@ class Dictionary:
 
 
 
-
+################################          TESTER               #########################################################
 strArray=["ba", "banana", "car", "cat", "dog", "doggy", "dump", "far", "formula", "in", "input", "int"]
-'''
-print(1)
+
+print("########    TESTING STR        ##############")
 dic1 = Dictionary(strArray,"STR")
 print(dic1.GetString())
 print(dic1.GetInfo("banana"))
-print(2)
+
+
+print("########   FINISHED TESTING     ##############")
+print("########    TESTING STR         ##############")
+print("BLOCK SIZE : 2 ")
 dic2 = Dictionary(strArray,("BLK",2))
-print(3)
+print("BLOCK SIZE : 3 ")
 dic3 = Dictionary(strArray,("BLK",3))
-'''
-'''
-
-'''
-
-print(4)
+print("BLOCK SIZE : 4 ")
 dic4 = Dictionary(strArray,("BLK",4))
 print(dic4.GetInfo("car"))
 print(dic4.GetInfo("dog"))
 print(dic4.GetInfo("int"))
-
-
-'''
-print(5)
+print("BLOCK SIZE : 5")
 dic5= Dictionary(strArray,("BLK",5))
-print(dic4.GetInfo("car"))
-print(dic4.GetInfo("doggy"))
-print(dic4.GetInfo("int"))
-
-print(6)
+print(dic5.GetInfo("car"))
+print(dic5.GetInfo("doggy"))
+print(dic5.GetInfo("int"))
+print("BLOCK SIZE : 6 ")
 dic6 = Dictionary(strArray,("BLK",6))
-print(dic4.GetInfo("car"))
-print(dic4.GetInfo("dump"))
-print(dic4.GetInfo("int"))
-print(7)
+print(dic6.GetInfo("car"))
+print(dic6.GetInfo("dump"))
+print(dic6.GetInfo("int"))
+print("BLOCK SIZE : 7 ")
 dic7 = Dictionary(strArray,("BLK",7))
-print(dic4.GetInfo("car"))
-print(dic4.GetInfo("far"))
-print(dic4.GetInfo("int"))
-print(8)
+print(dic7.GetInfo("car"))
+print(dic7.GetInfo("far"))
+print(dic7.GetInfo("int"))
+print("BLOCK SIZE : 8 ")
 dic8 = Dictionary(strArray,("BLK",8))
-print(dic4.GetInfo("car"))
-print(dic4.GetInfo("formula"))
-print(dic4.GetInfo("int"))
+print(dic8.GetInfo("car"))
+print(dic8.GetInfo("formula"))
+print(dic8.GetInfo("int"))
 
-'''
-dicFC4 = Dictionary(strArray,("FC",4))
-print(dicFC4.GetString() == "bananacartdoggyumpfarformulainputt")
-
-print(dicFC4.GetInfo("car"))
-print(dicFC4.GetInfo("dog"))
-print(dicFC4.GetInfo("int"))
-
-print("FC2")
+print("########   FINISHED TESTING     ##############")
+print("########    TESTING FC          ##############")
+print("FRONT CODING , BLOCK SIZE : 2 ")
 dicFC2 = Dictionary(strArray,("FC",2))
 print(dicFC2.GetInfo("car"))
 print(dicFC2.GetInfo("dog"))
 print(dicFC2.GetInfo("int"))
 
-print("FC3")
+print("FRONT CODING , BLOCK SIZE : 3 ")
 dicFC3 = Dictionary(strArray,("FC",3))
 print(dicFC3.GetInfo("car"))
 print(dicFC3.GetInfo("dog"))
 print(dicFC3.GetInfo("int"))
+print("FRONT CODING , BLOCK SIZE : 4 ")
+dicFC4 = Dictionary(strArray,("FC",4))
+print(dicFC4.GetString() == "bananacartdoggyumpfarformulainputt")
+print(dicFC4.GetInfo("car"))
+print(dicFC4.GetInfo("dog"))
+print(dicFC4.GetInfo("int"))
 
 
+
+print("########   FINISHED TESTING     ##############")
 
 
