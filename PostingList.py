@@ -14,18 +14,18 @@ class PostingList:
         self.DocIDs = DocIDs
         #calculateGaps
         self.__gaps = self.calculateGaps(DocIDs)
-        print(self.__gaps)
+        #print(self.__gaps)
         if type == "V": # Varint
                 self.__postingList = self.VBEncode(self.__gaps)
         elif type == "LP": # Length precoded
-            self.__postingList = self.VBEncode(self.__gaps)
+            self.__postingList = self.LPEncode(self.__gaps)
         elif type == "GV": # Group varint
-            pass
+            self.__postingList = self.GVEncoding(self.__gaps)
     ###############
     def calculateGaps(self,IDs):
         '''
         :param IDs: a list of posting IDs
-        :return: the array of the gaps between the IDs
+        :return: the array of gaps between the IDs
         '''
         gaps = [IDs[0]]
         index = 1
@@ -33,6 +33,7 @@ class PostingList:
             gaps.append(IDs[index]-IDs[index-1])
             index+=1
         return gaps
+
     ###############
     def VBEncodeNumber(self,n):
         bytesList = bytearray()
@@ -79,13 +80,14 @@ class PostingList:
         for number in numbers:
             if self.type =="V":
                 byteStream += self.VBEncodeNumber(number)
-            elif self.type =="LP":
-                byteStream += self.LPEncodingNumber(number)
-            elif type == "GV":
-                pass
         return byteStream
     ###############
-
+    def LPEncode(self,numbers):
+        byteStream = bytearray()
+        for number in numbers:
+            byteStream += self.LPEncodingNumber(number)
+        return byteStream
+    ###############
     def LPEncodingNumber(self,n):
         bytesList = bytearray()
         binaryNum = bin(n).replace("0b", "")
@@ -119,6 +121,9 @@ class PostingList:
             byteLength += binaryNum
             bytesList = self.bitsToBytes(byteLength)
             return bytesList
+        else:
+            print("Number is too long, can't encode")
+            return None
     ###############
 
     def bitsToBytes(self,bits):
@@ -134,7 +139,69 @@ class PostingList:
         return bytes
 
     ###############
+    def GVEncoding(self,numbers):
+        bytesList = bytearray()
+        tempNumbersList = numbers
+        while len(tempNumbersList) % 4 != 0:
+            tempNumbersList.append(0)  # append zeros to numbers list till the length of list is divisible by 4
+        while len(tempNumbersList) > 0:
+            if self.GVEncodingChunk(tempNumbersList[:4]) == None:
+                print("One of the numbers wasn't valid , couldn't encode")
+                return None
+            bytesList += self.GVEncodingChunk(tempNumbersList[:4])  # .append()
+            tempNumbersList = tempNumbersList[4:]
+        return bytesList
 
+    ###############
+    def GVEncodingChunk(self,numbers):
+        '''
+        :param numbers: list of 0 to 4 numbers
+        :return: a byte array of the Group Varint of the given list
+        '''
+        finalBytesList = bytearray()
+        currBytesList = bytearray()
+        if len(numbers) > 4:
+            print("To many numbers, can't encode")
+            return None
+        mask = ''
+        for num in numbers:
+            binaryNum = bin(num).replace("0b", "")
+            byteNum = ''
+            if len(binaryNum) > 32:
+                print("Number is too long, can't encode")
+                return None
+            elif len(binaryNum) < 9:
+                mask += '00'
+                zeros = '0' * (8 - len(binaryNum))  # CALCULATE ZEROS
+                byteNum += zeros
+                byteNum += binaryNum
+                currBytesList.append(int(byteNum, 2))
+            elif len(binaryNum) < 17:
+                mask += '01'
+                zeros = '0' * (16 - len(binaryNum))  # CALCULATE ZEROS
+                byteNum += zeros
+                byteNum += binaryNum
+                ####Bits to Bytes
+                currBytesList += self.bitsToBytes(byteNum)
+            elif len(binaryNum) < 25:
+                mask += '10'
+                zeros = '0' * (24 - len(binaryNum))  # CALCULATE ZEROS
+                byteNum += zeros
+                byteNum += binaryNum
+                ####Bits to Bytes
+                currBytesList += self.bitsToBytes(byteNum)
+            elif len(binaryNum) < 33:
+                mask += '11'
+                zeros = '0' * (32 - len(binaryNum))  # CALCULATE ZEROS
+                byteNum += zeros
+                byteNum += binaryNum
+                ####Bits to Bytes
+                currBytesList += self.bitsToBytes(byteNum)
+        finalBytesList.append(int(mask, 2))  # append mask to finalBytesList
+        finalBytesList += currBytesList  # appned currBytesList to finalBytesList
+        return finalBytesList
+
+    ###############
     def GetList(self):
         '''
         Returns a byte-array containing the
@@ -143,77 +210,51 @@ class PostingList:
         return self.__postingList
 
 
+#####################################             TESTER          ######################################################
+
 testList = [7,12,23,1033,2354634,2354636]
+###initializing big numbers for testing purposes##
+biggerThen32Bits = int('100000000000000000000000000000000',2)# decimal ===> 4294967296
+smallerThan23Bits = int('11111111111111111111111111111111',2) # decimal ===> 4294967295
 
+###########################################################################
+###########################################################################
+
+print('#####       TESTING  V       ########')
 postListV = PostingList(testList,"V")
-
 print(postListV.GetList())
+print('\n')
+###########################################################################
+###########################################################################
 
-
-
-################
-
-
-
-
-#a = bin(33).replace("0b","")
-#print(a)
-
-
-
-##print('\n\n\n\n######################################################################################################')
-
-
-
-
-
-
-
-
-'''
-print("length of number in bits is smaller than 7")
-print(LPEncoding(1))
-print(LPEncoding(7))
-print(LPEncoding(8))
-print(LPEncoding(14))
-print(LPEncoding(15))
-print(LPEncoding(22))
-print(LPEncoding(23))
-'''
+print('#####       TESTING  LP    ########')
 postListLP = PostingList(testList,"LP")
-print("length of number in bits is smaller than 15")
-
 print(postListLP.GetList())
-#print(LPEncoding(100))
-#print(LPEncoding(122))
+print('\n')
+###########################################################################
+###########################################################################
+
+print('#####      TESTING  GV      ########')
+
+bigNumberTestListGV = [44, 63, 256, 2354634,smallerThan23Bits]
+
+postListGV = PostingList(testList,"GV") # testList
+postListGV1 = PostingList(bigNumberTestListGV,"GV") # bigNumberTestListGV
+print(postListGV.GetList()) # output ====>  bytearray(b'\x01\x07\x05\x0b\x03\xf2\x80#\xe9\xc1\x02\x00\x00')
+print(postListGV1.GetList()) # output ====> bytearray(b'\x02,\x13\xc1#\xec\xca\xc0\xff\xdc\x125\x00\x00\x00')
+
+#####################################     END   OF TESTER     ##########################################################
 
 
-
-
-'''
-a = bin(824).replace("0b","")
-print("original a : {}".format(a))
-end = a[-7:]
-print("end pre inversion : {}".format(end))
-end = end[::-1]
-print("end post inversion : {}".format(end))
-end +='1'
-print("adding 1 to end : {}".format(end))
-newEnd = end[::-1]
-print("newEnd : {}".format(newEnd))
-a = a[:len(a)-7]
-print("a after slicing : {}".format(a))
-a = a[::-1]
-print("a post inversion : {}".format(a))
-a += '0'*5
-print("a post zeros : {}".format(a))
-a = a[::-1]
-print("a inverted   : {}".format(a))
 
 '''
 
 
 '''
+
+############################################################################
+'''
+    #############PSEUDO CODE############
     def VBEncodeNumber(self,n):
         bytesList = bytearray() #initialize byte array
         temp = n

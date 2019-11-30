@@ -4,9 +4,6 @@ class Dictionary:
     __table = []# MAYBE NOT GLOBALLY???
     type = ""
     k = 0
-
-    #blk (index , lengths)
-    #fc  [(index, (lentgh,prefix length),  ...., .....),(index, (lentgh,prefix length),  ...., .....)]
     def __init__(self, TermList, type):
         """Given sorted list of terms, creates a data
         structure which holds a compressed dictionary
@@ -80,6 +77,7 @@ class Dictionary:
                     return prefix
         return prefix
     #########################################
+    
     def GetString(self):
         """Returns the dictionary's string"""
         return self.__dictionaryStr
