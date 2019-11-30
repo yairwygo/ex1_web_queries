@@ -76,7 +76,6 @@ class PostingList:
 
     def VBEncode(self,numbers):
         byteStream = bytearray()
-        #print(numbers)
         for number in numbers:
             if self.type =="V":
                 byteStream += self.VBEncodeNumber(number)
