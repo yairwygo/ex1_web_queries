@@ -193,7 +193,7 @@ print(dicFC4.GetInfo("int"))
 
 
 
-print("########   FINISHED TESTING     ##############")
+print("########   FINISHED TESTING     ############")
 
 
 
