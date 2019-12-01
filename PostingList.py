@@ -222,6 +222,7 @@ smallerThan23Bits = int('11111111111111111111111111111111',2) # decimal ===> 429
 print('#####       TESTING  V       ########')
 postListV = PostingList(testList,"V")
 print(postListV.GetList())
+print("".join("\\x%02x" % i for i in postListV.GetList()))
 print('\n')
 ###########################################################################
 ###########################################################################
