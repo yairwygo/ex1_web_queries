@@ -1,7 +1,7 @@
 class Dictionary:
 
     __dictionaryStr = ""
-    __table = []# MAYBE NOT GLOBALLY???
+    __table = []
     type = ""
     k = 0
     def __init__(self, TermList, type):
@@ -38,32 +38,34 @@ class Dictionary:
                     while count < self.k:
                         if self.TermList[i+count] == None:
                             break
+                        self.__dictionaryStr += self.TermList[i+count]
                         block.append(len(self.TermList[i+count]))
                         count+=1
                     self.__table.append(tuple(block))
-
-                #print(self.__table)
-                #TO String
             elif self.type == "FC":
+                track = 0
                 for i in range(0, len(TermList), self.k):
                     if self.TermList[i] == None:
                         break
-                    block = [self.termLocation(self.TermList[i]),(len(self.TermList[i]),0)]
+                    block = [track,(len(self.TermList[i]),0)]
+                    track+=len(self.TermList[i])
                     count = 1
                     self.__dictionaryStr += self.TermList[i]
+                    tracking = 0
                     while count < self.k  :
+
                         currWord = self.TermList[i+count - 1]
                         nextWord = self.TermList[i+count]
-                        #print("iteration :  {}\ncurrWord : {}\nnextWord : {}  ".format(count,currWord,nextWord))
                         if currWord == None:
                             break
                         prefix = self.calcPrefix(currWord, nextWord)# CALCULATE PREFIX
+                        tracking +=len(nextWord)-len(prefix)
                         self.__dictionaryStr += nextWord[len(prefix):]
                         block.append((len(nextWord), len(prefix)))
                         count += 1
+                    track +=tracking
                     self.__table.append(tuple(block))
-                #print(self.__dictionaryStr)
-                #print(self.__table)
+
 
 
     #########################################
@@ -82,8 +84,6 @@ class Dictionary:
         """Returns the dictionary's string"""
         return self.__dictionaryStr
     def GetInfo(self, term):
-        #print("in getInfo")
-        #print(term)
         """ Returns relevant data about term.
         For "STR" it returns the location of the term
         in the string
@@ -97,18 +97,22 @@ class Dictionary:
         location = self.termLocation(term)
         if self.type == "STR":
             return location
-        else:
+        elif self.type == "BLK":
             for tup in self.__table:
                 index =1
                 currLocation = tup[0]
                 while index <= self.k:
                     if location == currLocation :
                         return tup
-                    if self.type == "BLK":
-                        currLocation += tup[index]#pointer to next term in the block
-                    elif self.type == "FC":
-                        currLocation += tup[index][0]  # pointer to next term in the block
+                    currLocation += tup[index]#pointer to next term in the block
                     index += 1
+        elif self.type == "FC":
+            index = 0
+            for word in self.TermList:
+                if term == word:
+                    return self.__table[(index%self.k)]
+                index+=1
+            return None
 
     #############################
 
@@ -116,15 +120,17 @@ class Dictionary:
         location = 0
         for word in self.TermList:
             if word == term:
-                break
+                return location
             location += len(word)
-        return location
+        return None
 
      ############################
 
 
-
 ################################          TESTER               #########################################################
+'''
+
+
 strArray=["ba", "banana", "car", "cat", "dog", "doggy", "dump", "far", "formula", "in", "input", "int"]
 
 print("########    TESTING STR        ##############")
@@ -189,4 +195,7 @@ print(dicFC4.GetInfo("int"))
 
 print("########   FINISHED TESTING     ##############")
 
+
+
+'''
 
