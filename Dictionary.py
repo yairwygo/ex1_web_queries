@@ -112,7 +112,7 @@ class Dictionary:
                 if term == word:
                     return self.__table[(index%self.k)]
                 index+=1
-            return None
+
 
     #############################
 
